@@ -18,10 +18,9 @@ apply_cmssw_customization_steps() {
 CMSSW_VERSION="CMSSW_14_1_0_pre5"
 
 link_cmssw_modules(){ # here go all the links to the CMSSW modules
-    mkdir -p cmssw_modules
-    mkdir -p "$ANALYSIS_PATH/cmssw_modules/L1Trigger/CSCTriggerPrimitives"
-    ln -s $FLAF_CMSSW_BASE/src/L1Trigger/CSCTriggerPrimitives/ "$ANALYSIS_PATH/cmssw_modules/L1Trigger/CSCTriggerPrimitives/"
-
+    echo "Linking CMSSW modules..."
+    mkdir -p $ANALYSIS_PATH/cmssw_modules
+    run_cmd ln -s $ANALYSIS_SOFT_PATH/$CMSSW_VER/src/L1Trigger/ $ANALYSIS_PATH/cmssw_modules/L1Trigger
 }
 action() {
     local this_file="$( [ ! -z "$ZSH_VERSION" ] && echo "${(%):-%x}" || echo "${BASH_SOURCE[0]}" )"
@@ -31,10 +30,10 @@ action() {
     echo "Running action with CMSSW version: $CMSSW_VERSION"
     echo source $ANALYSIS_PATH/GEM-CSC-trg-dev/env.sh "$this_file_path" "$CMSSW_VERSION" "$@"
     source $ANALYSIS_PATH/GEM-CSC-trg-dev/env.sh "$this_file_path" "$CMSSW_VERSION" "$@"
+    run_cmd link_cmssw_modules
 
 }
 action "$@"
-link_cmssw_modules
 
 unset -f action
 unset -f apply_cmssw_customization_steps
