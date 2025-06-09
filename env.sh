@@ -1,3 +1,13 @@
+run_cmd_env() {
+  # echo "> $@"
+  "$@"
+  RESULT=$?
+  if (( $RESULT != 0 )); then
+    echo "Error while running '$@'"
+    kill -INT $$
+  fi
+}
+
 apply_cmssw_customization_steps() {
     run_cmd git cms-init
     run_cmd git cms-addpkg L1Trigger/CSCTriggerPrimitives
@@ -19,8 +29,8 @@ CMSSW_VERSION="CMSSW_14_1_0_pre5"
 
 link_cmssw_modules(){ # here go all the links to the CMSSW modules
     echo "Linking CMSSW modules..."
-    mkdir -p $ANALYSIS_PATH/cmssw_modules
-    run_cmd ln -s $ANALYSIS_SOFT_PATH/$CMSSW_VER/src/L1Trigger/ $ANALYSIS_PATH/cmssw_modules/L1Trigger
+    run_cmd_env mkdir -p $ANALYSIS_PATH/cmssw_modules
+    run_cmd_env ln -s $ANALYSIS_SOFT_PATH/$CMSSW_VER/src/L1Trigger $ANALYSIS_PATH/cmssw_modules/L1Trigger
 }
 action() {
     local this_file="$( [ ! -z "$ZSH_VERSION" ] && echo "${(%):-%x}" || echo "${BASH_SOURCE[0]}" )"
@@ -30,11 +40,12 @@ action() {
     echo "Running action with CMSSW version: $CMSSW_VERSION"
     echo source $ANALYSIS_PATH/GEM-CSC-trg-dev/env.sh "$this_file_path" "$CMSSW_VERSION" "$@"
     source $ANALYSIS_PATH/GEM-CSC-trg-dev/env.sh "$this_file_path" "$CMSSW_VERSION" "$@"
-    run_cmd link_cmssw_modules
+    run_cmd_env link_cmssw_modules
 
 }
 action "$@"
 
 unset -f action
+unset -f run_cmd_env
 unset -f apply_cmssw_customization_steps
 unset -f link_cmssw_modules

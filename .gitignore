@@ -1,2 +1,4 @@
 /soft
 /cmssw_modules
+*.csv
+*.root
