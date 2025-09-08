@@ -2,3 +2,5 @@
 /cmssw_modules
 *.csv
 *.root
+/data
+/crab_test
